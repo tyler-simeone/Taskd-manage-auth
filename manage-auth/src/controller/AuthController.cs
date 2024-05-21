@@ -1,5 +1,6 @@
-using manage_auth.src.models;
+using manage_auth.src.models.requests;
 using manage_auth.src.repository;
+using manage_auth.src.util;
 using Microsoft.AspNetCore.Mvc;
 
 namespace manage_auth.src.controller
@@ -19,9 +20,9 @@ namespace manage_auth.src.controller
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetTask(int id, int userId)
+        public async Task<ActionResult> GetBearerToken(int userId)
         {
-            if (_validator.ValidateGetTask(id, userId))
+            if (_validator.ValidateGetBearerToken(userId))
             {
                 try
                 {
@@ -41,9 +42,9 @@ namespace manage_auth.src.controller
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult CreateTask(CreateTask createTaskRequest)
+        public IActionResult RegisterUser(CreateUser createUserRequest)
         {
-            if (_validator.ValidateCreateTask(createTaskRequest))
+            if (_validator.ValidateCreateUser(createUserRequest))
             {
                 try
                 {
@@ -57,7 +58,51 @@ namespace manage_auth.src.controller
             }
             else
             {
-                return BadRequest("CreateTaskRequest is required.");
+                return BadRequest("CreateUserRequest is required.");
+            }
+        }
+        
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult AuthenticateUser(AuthenticateUser authenticateUserRequest)
+        {
+            if (_validator.ValidateAuthenticateUser(authenticateUserRequest))
+            {
+                try
+                {
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                    throw;
+                }
+            }
+            else
+            {
+                return BadRequest("CreateUserRequest is required.");
+            }
+        }
+        
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult AuthorizeRequest(AuthorizeRequest authorizeRequestRequest)
+        {
+            if (_validator.ValidateAuthorizeRequest(authorizeRequestRequest))
+            {
+                try
+                {
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                    throw;
+                }
+            }
+            else
+            {
+                return BadRequest("CreateUserRequest is required.");
             }
         }
     }
