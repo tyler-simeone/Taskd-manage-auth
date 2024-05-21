@@ -510,4 +510,7 @@ bld/
 [Bb]in/
 [Oo]bj/
 
-appsettings.json
+# env-specifc app settings
+appsettings.Development.json
+appsettings.Staging.json
+appsettings.Production.json
