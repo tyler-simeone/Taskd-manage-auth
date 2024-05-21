@@ -18,7 +18,7 @@ namespace manage_auth.src.controller
             _authRepository = authRepository;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> GetBearerToken(int userId)
         {
@@ -40,7 +40,7 @@ namespace manage_auth.src.controller
             }
         }
 
-        [HttpPost]
+        [HttpPost("authenticate")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult AuthenticateRequest(AuthenticateRequest authenticateRequestRequest)
         {
@@ -62,7 +62,7 @@ namespace manage_auth.src.controller
             }
         }
 
-        [HttpPost]
+        [HttpPost("authorize")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult AuthorizeRequest(AuthorizeRequest authorizeRequestRequest)
         {
@@ -84,7 +84,7 @@ namespace manage_auth.src.controller
             }
         }
 
-        [HttpPost]
+        [HttpPost("user")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult RegisterUser(CreateUser createUserRequest)
         {
@@ -106,7 +106,7 @@ namespace manage_auth.src.controller
             }
         }
         
-        [HttpPost]
+        [HttpPost("user/authenticate")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult AuthenticateUser(AuthenticateUser authenticateUserRequest)
         {
