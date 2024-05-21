@@ -5,12 +5,15 @@ namespace manage_auth.src.util
     public interface IRequestValidator
     {
         bool ValidateGetBearerToken(int userId);
+        
+        bool ValidateAuthorizeRequest(AuthorizeRequest authorizeRequestRequest);
+        
+        bool ValidateAuthenticateRequest(AuthenticateRequest authenticateRequestRequest);
 
         bool ValidateCreateUser(CreateUser createUserRequest);
         
         bool ValidateAuthenticateUser(AuthenticateUser authenticateUserRequest);
 
-        bool ValidateAuthorizeRequest(AuthorizeRequest authorizeRequestRequest);
     }
 
     public class RequestValidator : IRequestValidator
@@ -25,17 +28,22 @@ namespace manage_auth.src.util
             return true;
         }
 
+        public bool ValidateAuthenticateRequest(AuthenticateRequest authenticateRequestRequest)
+        {
+            return true;
+        }
+
+        public bool ValidateAuthorizeRequest(AuthorizeRequest authorizeRequestRequest)
+        {
+            return true;
+        }
+
         public bool ValidateCreateUser(CreateUser createUserRequest)
         {
             return true;
         }
         
         public bool ValidateAuthenticateUser(AuthenticateUser authenticateUserRequest)
-        {
-            return true;
-        }
-        
-        public bool ValidateAuthorizeRequest(AuthorizeRequest authorizeRequestRequest)
         {
             return true;
         }

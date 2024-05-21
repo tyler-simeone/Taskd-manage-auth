@@ -7,12 +7,12 @@ namespace manage_auth.src.models
 
         }
         
-        public bool Get { get; set; }
+        public static bool Get { get; set; }
         
-        public bool Create { get; set; }
+        public static bool Create { get; set; }
         
-        public bool Update { get; set; }
+        public static bool Update { get; set; }
         
-        public bool Delete { get; set; }
+        public static bool Delete { get; set; }
     }
 }

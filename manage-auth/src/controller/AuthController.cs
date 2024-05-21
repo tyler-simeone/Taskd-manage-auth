@@ -42,6 +42,50 @@ namespace manage_auth.src.controller
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult AuthenticateRequest(AuthenticateRequest authenticateRequestRequest)
+        {
+            if (_validator.ValidateAuthenticateRequest(authenticateRequestRequest))
+            {
+                try
+                {
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                    throw;
+                }
+            }
+            else
+            {
+                return BadRequest("CreateUserRequest is required.");
+            }
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult AuthorizeRequest(AuthorizeRequest authorizeRequestRequest)
+        {
+            if (_validator.ValidateAuthorizeRequest(authorizeRequestRequest))
+            {
+                try
+                {
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                    throw;
+                }
+            }
+            else
+            {
+                return BadRequest("CreateUserRequest is required.");
+            }
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult RegisterUser(CreateUser createUserRequest)
         {
             if (_validator.ValidateCreateUser(createUserRequest))
@@ -67,28 +111,6 @@ namespace manage_auth.src.controller
         public IActionResult AuthenticateUser(AuthenticateUser authenticateUserRequest)
         {
             if (_validator.ValidateAuthenticateUser(authenticateUserRequest))
-            {
-                try
-                {
-                    return Ok();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                    throw;
-                }
-            }
-            else
-            {
-                return BadRequest("CreateUserRequest is required.");
-            }
-        }
-        
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult AuthorizeRequest(AuthorizeRequest authorizeRequestRequest)
-        {
-            if (_validator.ValidateAuthorizeRequest(authorizeRequestRequest))
             {
                 try
                 {
