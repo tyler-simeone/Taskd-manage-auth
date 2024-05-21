@@ -1,52 +1,51 @@
-public interface IRequestValidator
+using manage_auth.src.models.requests;
+
+namespace manage_auth.src.util
 {
-    bool ValidateGetTask(int taskId, int userId);
-
-    bool ValidateGetTasks(int columnId);
-    
-    bool GetColumnsWithTasks(int boardId, int userId);
-
-    bool ValidateCreateTask(CreateTask createTaskRequest);
-
-    bool ValidateUpdateTask(UpdateTask updateTaskRequest);
-
-    bool ValidateDeleteTask(int taskId, int userId);
-}
-
-public class RequestValidator : IRequestValidator
-{
-    public RequestValidator()
+    public interface IRequestValidator
     {
+        bool ValidateGetBearerToken(int userId);
         
+        bool ValidateAuthorizeRequest(AuthorizeRequest authorizeRequestRequest);
+        
+        bool ValidateAuthenticateRequest(AuthenticateRequest authenticateRequestRequest);
+
+        bool ValidateCreateUser(CreateUser createUserRequest);
+        
+        bool ValidateAuthenticateUser(AuthenticateUser authenticateUserRequest);
+
     }
 
-    public bool ValidateGetTask(int taskId, int userId)
+    public class RequestValidator : IRequestValidator
     {
-        return true;
-    }
+        public RequestValidator()
+        {
 
-    public bool ValidateGetTasks(int userId)
-    {
-        return true;
-    }
+        }
 
-    public bool GetColumnsWithTasks(int boardId, int userId)
-    {
-        return true;
-    }
+        public bool ValidateGetBearerToken(int userId)
+        {
+            return true;
+        }
 
-    public bool ValidateCreateTask(CreateTask createTaskRequest)
-    {
-        return true;
-    }
-    
-    public bool ValidateUpdateTask(UpdateTask updateTaskRequest)
-    {
-        return true;
-    }
-    
-    public bool ValidateDeleteTask(int taskId, int userId)
-    {
-        return true;
+        public bool ValidateAuthenticateRequest(AuthenticateRequest authenticateRequestRequest)
+        {
+            return true;
+        }
+
+        public bool ValidateAuthorizeRequest(AuthorizeRequest authorizeRequestRequest)
+        {
+            return true;
+        }
+
+        public bool ValidateCreateUser(CreateUser createUserRequest)
+        {
+            return true;
+        }
+        
+        public bool ValidateAuthenticateUser(AuthenticateUser authenticateUserRequest)
+        {
+            return true;
+        }
     }
 }
