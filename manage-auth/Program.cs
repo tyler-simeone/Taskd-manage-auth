@@ -5,14 +5,21 @@ using manage_auth.src.util;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using manage_auth.src.clients;
+
+var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+// Console.WriteLine($"ASPNETCORE_ENVIRONMENT: {environmentName}");
 
 var builder = WebApplication.CreateBuilder(args);
 
 // app config setup
 var configuration = builder.Configuration;
+// var env = builder.Environment;
+// Console.WriteLine("env: ", env);
+// Console.WriteLine("env.EnvironmentName: ", env.EnvironmentName);
+
 configuration.AddJsonFile("appsettings.json", optional: false);
-var userPoolId = configuration["AWS:Cognito:UserPoolId"];
-var awsRegion = configuration["AWS:Cognito:Region"];
+configuration.AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true);
 
 
 // Add services to the container.
@@ -20,6 +27,7 @@ builder.Services.AddControllers();;
 builder.Services.AddSingleton<IRequestValidator, RequestValidator>();
 builder.Services.AddSingleton<IAuthRepository, AuthRepository>();
 builder.Services.AddSingleton<IAuthDataservice, AuthDataservice>();
+builder.Services.AddSingleton<ICognitoClient, CognitoClient>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -37,6 +45,10 @@ builder.Services.AddSwaggerGen(options =>
                     },
         });
     });
+
+
+var userPoolId = configuration["AWS:Cognito:UserPoolId"];
+var awsRegion = configuration["AWS:Cognito:Region"];
 
 // Add JWT Bearer Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

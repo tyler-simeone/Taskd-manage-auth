@@ -1,3 +1,4 @@
+using manage_auth.src.clients;
 using manage_auth.src.models.requests;
 using manage_auth.src.repository;
 using manage_auth.src.util;
@@ -11,11 +12,13 @@ namespace manage_auth.src.controller
     {
         IRequestValidator _validator;
         IAuthRepository _authRepository;
+        ICognitoClient _cognitoClient;
 
-        public AuthController(IAuthRepository authRepository, IRequestValidator requestValidator)
+        public AuthController(IAuthRepository authRepository, IRequestValidator requestValidator, ICognitoClient cognitoClient)
         {
             _validator = requestValidator;
             _authRepository = authRepository;
+            _cognitoClient = cognitoClient;
         }
 
         [HttpGet]
@@ -86,12 +89,13 @@ namespace manage_auth.src.controller
 
         [HttpPost("user")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult RegisterUser(CreateUser createUserRequest)
+        public async Task<IActionResult> RegisterUser(CreateUser createUserRequest)
         {
             if (_validator.ValidateCreateUser(createUserRequest))
             {
                 try
                 {
+                    await _cognitoClient.SignUpUserAsync(createUserRequest.Email, createUserRequest.Password, createUserRequest.FirstName, createUserRequest.LastName);
                     return Ok();
                 }
                 catch (Exception ex)

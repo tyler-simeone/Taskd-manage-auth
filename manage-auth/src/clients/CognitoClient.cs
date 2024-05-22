@@ -4,41 +4,70 @@ using System.Threading.Tasks;
 using manage_auth.src.models;
 using System.Net.Http.Formatting;
 using Newtonsoft.Json;
+using Amazon.CognitoIdentityProvider;
+using Amazon.CognitoIdentityProvider.Model;
+using Microsoft.Extensions.Configuration;
+using Amazon;
+using Amazon.Runtime;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace manage_auth.src.clients
 {
     public class CognitoClient : ICognitoClient
     {
-        private IConfiguration _configuration;
-        private readonly HttpClient _client;
+        private readonly string _userPoolId;
+        private readonly string _clientId;
+        private readonly string _clientSecret;
+        private readonly string _accessKey;
+        private readonly string _secretAccessKey;
+        private readonly AmazonCognitoIdentityProviderClient _cognitoClient;
 
         public CognitoClient(IConfiguration configuration)
         {
-            _configuration = configuration;
-            _client = new HttpClient
-            {
-                BaseAddress = new Uri(_configuration.GetConnectionString("ManageTasksLocalConnection"))
-            };
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            _userPoolId = configuration["AWS:Cognito:UserPoolId"];
+            _clientId = configuration["AWS:Cognito:ClientId"];
+            _clientSecret = configuration["AWS:Cognito:ClientSecret"];
+            _accessKey = configuration["AWS:Cognito:AccessKey"];
+            _secretAccessKey = configuration["AWS:Cognito:SecretAccessKey"];
+
+            var credentials = new BasicAWSCredentials(_accessKey, _secretAccessKey);
+            _cognitoClient = new AmazonCognitoIdentityProviderClient(credentials, RegionEndpoint.USEast1);
         }
 
-        // public async Task<TaskList> GetTasks(int columnId, int userId)
-        // {
-            
-        //     var responseData = new TaskList();
-        //     HttpResponseMessage response = await _client.GetAsync($"/api/Tasks/{columnId}?userId={userId}");
+        public async Task SignUpUserAsync(string email, string password, string firstName, string lastName)
+        {
+            var secretHash = GetSecretHash(email, _clientId, _clientSecret);
+            var signUpRequest = new SignUpRequest
+            {
+                ClientId = _clientId,
+                SecretHash = secretHash,
+                Username = email,
+                Password = password,
+                UserAttributes = new List<AttributeType>
+                {
+                    new AttributeType { Name = "email", Value = email },
+                    new AttributeType { Name = "name", Value = firstName + " " + lastName }
+                }
+            };
 
-        //     if (response.IsSuccessStatusCode)
-        //     {
-        //         responseData = await response.Content.ReadAsAsync<TaskList>();
-        //     }
-        //     else 
-        //     {
-        //         throw new Exception(response.ReasonPhrase);
-        //     }
+            await _cognitoClient.SignUpAsync(signUpRequest);
+        }
 
-        //     return responseData;
-        // }
+        #region HELPERS
+
+        private string GetSecretHash(string username, string clientId, string clientSecret)
+        {
+            string message = username + clientId;
+            var key = Encoding.UTF8.GetBytes(clientSecret);
+            var msg = Encoding.UTF8.GetBytes(message);
+            using (var hmac = new HMACSHA256(key))
+            {
+                var hash = hmac.ComputeHash(msg);
+                return Convert.ToBase64String(hash);
+            }
+        }
+
+        #endregion
     }
 }
