@@ -110,14 +110,38 @@ namespace manage_auth.src.controller
             }
         }
         
+        [HttpPost("user/confirm")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ConfirmUser(ConfirmUserRequest confirmUserRequest)
+        {
+            if (_validator.ValidateConfirmUser(confirmUserRequest))
+            {
+                try
+                {
+                    var confirmSignUpResponse = await _cognitoClient.ConfirmUserAsync(confirmUserRequest);
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                    throw;
+                }
+            }
+            else
+            {
+                return BadRequest("CreateUserRequest is required.");
+            }
+        }
+        
         [HttpPost("user/authenticate")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult AuthenticateUser(AuthenticateUser authenticateUserRequest)
+        public async Task<IActionResult> AuthenticateUser(AuthenticateUserRequest authenticateUserRequest)
         {
             if (_validator.ValidateAuthenticateUser(authenticateUserRequest))
             {
                 try
                 {
+                    var tokens = await _cognitoClient.AuthenticateUserAsync(authenticateUserRequest);
                     return Ok();
                 }
                 catch (Exception ex)

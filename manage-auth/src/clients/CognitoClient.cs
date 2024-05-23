@@ -11,6 +11,8 @@ using Amazon;
 using Amazon.Runtime;
 using System.Text;
 using System.Security.Cryptography;
+using Amazon.Extensions.CognitoAuthentication;
+using manage_auth.src.models.requests;
 
 namespace manage_auth.src.clients
 {
@@ -52,6 +54,60 @@ namespace manage_auth.src.clients
             };
 
             await _cognitoClient.SignUpAsync(signUpRequest);
+        }
+        
+        public async Task<InitiateAuthResponse> AuthenticateUserAsync(AuthenticateUserRequest authUserRequest)
+        {
+            var authRequest = new InitiateAuthRequest
+            {
+                AuthFlow = AuthFlowType.USER_PASSWORD_AUTH,
+                ClientId = _clientId,
+                AuthParameters = new Dictionary<string, string>
+                {
+                    { "USERNAME", authUserRequest.Email },
+                    { "PASSWORD", authUserRequest.Password },
+                    { "SECRET_HASH", GetSecretHash(authUserRequest.Email, _clientId, _clientSecret) }
+                }
+            };
+
+            try
+            {
+                var authResponse = await _cognitoClient.InitiateAuthAsync(authRequest).ConfigureAwait(false);
+
+                Console.WriteLine("Authentication successful");
+                Console.WriteLine($"ID Token: {authResponse.AuthenticationResult.IdToken}");
+                Console.WriteLine($"Access Token: {authResponse.AuthenticationResult.AccessToken}");
+                Console.WriteLine($"Refresh Token: {authResponse.AuthenticationResult.RefreshToken}");
+
+                return authResponse;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error authenticating user: {e.Message}");
+                throw e;
+            }
+        }
+        
+        public async Task<ConfirmSignUpResponse> ConfirmUserAsync(ConfirmUserRequest confirmUserRequest)
+        {
+            var confirmRequest = new ConfirmSignUpRequest
+            {
+                ClientId = _clientId,
+                Username = confirmUserRequest.Email,
+                ConfirmationCode = confirmUserRequest.ConfirmationCode,
+                SecretHash = GetSecretHash(confirmUserRequest.Email, _clientId, _clientSecret)
+            };
+
+            try
+            {
+                var authResponse = await _cognitoClient.ConfirmSignUpAsync(confirmRequest).ConfigureAwait(false);
+                return authResponse;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error authenticating user: {e.Message}");
+                throw e;
+            }
         }
 
         #region HELPERS
