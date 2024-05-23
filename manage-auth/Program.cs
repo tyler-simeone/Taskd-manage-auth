@@ -14,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // app config setup
 var configuration = builder.Configuration;
+
 // var env = builder.Environment;
 // Console.WriteLine("env: ", env);
 // Console.WriteLine("env.EnvironmentName: ", env.EnvironmentName);

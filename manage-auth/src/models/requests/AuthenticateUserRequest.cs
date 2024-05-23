@@ -1,8 +1,8 @@
 namespace manage_auth.src.models.requests
 {
-    public class AuthenticateUser
+    public class AuthenticateUserRequest
     {
-        public AuthenticateUser()
+        public AuthenticateUserRequest()
         {
 
         }
