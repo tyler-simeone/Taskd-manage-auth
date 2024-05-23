@@ -43,11 +43,11 @@ namespace manage_auth.src.controller
             }
         }
 
-        [HttpPost("authenticate")]
+        [HttpPost("authorize")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult AuthenticateRequest(AuthenticateRequest authenticateRequestRequest)
+        public IActionResult AuthorizeRequest(AuthorizeRequest authorizeRequestRequest)
         {
-            if (_validator.ValidateAuthenticateRequest(authenticateRequestRequest))
+            if (_validator.ValidateAuthorizeRequest(authorizeRequestRequest))
             {
                 try
                 {
@@ -65,15 +65,16 @@ namespace manage_auth.src.controller
             }
         }
 
-        [HttpPost("authorize")]
+        [HttpPost("user/authenticate")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult AuthorizeRequest(AuthorizeRequest authorizeRequestRequest)
+        public async Task<IActionResult> AuthenticateUser(AuthenticateUserRequest authenticateUserRequest)
         {
-            if (_validator.ValidateAuthorizeRequest(authorizeRequestRequest))
+            if (_validator.ValidateAuthenticateUser(authenticateUserRequest))
             {
                 try
                 {
-                    return Ok();
+                    var authResponse = await _cognitoClient.AuthenticateUserAsync(authenticateUserRequest);
+                    return Ok(authResponse);
                 }
                 catch (Exception ex)
                 {
@@ -119,29 +120,6 @@ namespace manage_auth.src.controller
                 try
                 {
                     var confirmSignUpResponse = await _cognitoClient.ConfirmUserAsync(confirmUserRequest);
-                    return Ok();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                    throw;
-                }
-            }
-            else
-            {
-                return BadRequest("CreateUserRequest is required.");
-            }
-        }
-        
-        [HttpPost("user/authenticate")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> AuthenticateUser(AuthenticateUserRequest authenticateUserRequest)
-        {
-            if (_validator.ValidateAuthenticateUser(authenticateUserRequest))
-            {
-                try
-                {
-                    var tokens = await _cognitoClient.AuthenticateUserAsync(authenticateUserRequest);
                     return Ok();
                 }
                 catch (Exception ex)
