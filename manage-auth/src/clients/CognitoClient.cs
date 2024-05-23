@@ -1,17 +1,9 @@
-using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-using manage_auth.src.models;
-using System.Net.Http.Formatting;
-using Newtonsoft.Json;
 using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
-using Microsoft.Extensions.Configuration;
 using Amazon;
 using Amazon.Runtime;
 using System.Text;
 using System.Security.Cryptography;
-using Amazon.Extensions.CognitoAuthentication;
 using manage_auth.src.models.requests;
 
 namespace manage_auth.src.clients
@@ -37,25 +29,6 @@ namespace manage_auth.src.clients
             _cognitoClient = new AmazonCognitoIdentityProviderClient(credentials, RegionEndpoint.USEast1);
         }
 
-        public async Task SignUpUserAsync(string email, string password, string firstName, string lastName)
-        {
-            var secretHash = GetSecretHash(email, _clientId, _clientSecret);
-            var signUpRequest = new SignUpRequest
-            {
-                ClientId = _clientId,
-                SecretHash = secretHash,
-                Username = email,
-                Password = password,
-                UserAttributes = new List<AttributeType>
-                {
-                    new AttributeType { Name = "email", Value = email },
-                    new AttributeType { Name = "name", Value = firstName + " " + lastName }
-                }
-            };
-
-            await _cognitoClient.SignUpAsync(signUpRequest);
-        }
-        
         public async Task<InitiateAuthResponse> AuthenticateUserAsync(AuthenticateUserRequest authUserRequest)
         {
             var authRequest = new InitiateAuthRequest
@@ -73,12 +46,6 @@ namespace manage_auth.src.clients
             try
             {
                 var authResponse = await _cognitoClient.InitiateAuthAsync(authRequest).ConfigureAwait(false);
-
-                Console.WriteLine("Authentication successful");
-                Console.WriteLine($"ID Token: {authResponse.AuthenticationResult.IdToken}");
-                Console.WriteLine($"Access Token: {authResponse.AuthenticationResult.AccessToken}");
-                Console.WriteLine($"Refresh Token: {authResponse.AuthenticationResult.RefreshToken}");
-
                 return authResponse;
             }
             catch (Exception e)
@@ -86,6 +53,25 @@ namespace manage_auth.src.clients
                 Console.WriteLine($"Error authenticating user: {e.Message}");
                 throw e;
             }
+        }
+
+        public async Task SignUpUserAsync(string email, string password, string firstName, string lastName)
+        {
+            var secretHash = GetSecretHash(email, _clientId, _clientSecret);
+            var signUpRequest = new SignUpRequest
+            {
+                ClientId = _clientId,
+                SecretHash = secretHash,
+                Username = email,
+                Password = password,
+                UserAttributes = new List<AttributeType>
+                {
+                    new AttributeType { Name = "email", Value = email },
+                    new AttributeType { Name = "name", Value = firstName + " " + lastName }
+                }
+            };
+
+            await _cognitoClient.SignUpAsync(signUpRequest);
         }
         
         public async Task<ConfirmSignUpResponse> ConfirmUserAsync(ConfirmUserRequest confirmUserRequest)
