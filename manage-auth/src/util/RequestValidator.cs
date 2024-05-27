@@ -10,7 +10,7 @@ namespace manage_auth.src.util
         
         bool ValidateAuthenticateRequest(AuthenticateRequest authenticateRequestRequest);
 
-        bool ValidateCreateUser(CreateUser createUserRequest);
+        bool ValidateCreateUser(CreateUserRequest createUserRequest);
         
         bool ValidateConfirmUser(ConfirmUserRequest confirmUserRequest);
 
@@ -40,7 +40,7 @@ namespace manage_auth.src.util
             return true;
         }
 
-        public bool ValidateCreateUser(CreateUser createUserRequest)
+        public bool ValidateCreateUser(CreateUserRequest createUserRequest)
         {
             return true;
         }
