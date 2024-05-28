@@ -1,6 +1,5 @@
 using System.Net;
 using System.Net.Http.Headers;
-using System.Text;
 using manage_auth.src.clients;
 using manage_auth.src.models;
 using manage_auth.src.models.errors;
