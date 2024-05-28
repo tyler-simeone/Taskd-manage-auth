@@ -6,5 +6,7 @@ namespace manage_auth.src.clients
     public interface IUsersClient
     { 
         public Task<HttpResponseMessage> CreateUser(CreateUserRequest createUserRequest, string bearerToken);
+        
+        public Task<User> GetUser(string email, string bearerToken);
     }
 }

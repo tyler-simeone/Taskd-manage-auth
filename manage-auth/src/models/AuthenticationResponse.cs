@@ -2,12 +2,14 @@ using Amazon.CognitoIdentityProvider.Model;
 
 namespace manage_auth.src.models
 {
-    public class AuthResponse : ResponseBase
+    public class AuthenticationResponse : ResponseBase
     {
-        public AuthResponse()
+        public AuthenticationResponse()
         {
-            Type = "AuthResponse";
+            Type = "AuthenticationResponse";
         }
+        
         public AuthenticationResultType AuthenticationResult { get; set; }
+        public User User { get; set; }
     }
 }

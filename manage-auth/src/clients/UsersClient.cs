@@ -2,8 +2,6 @@
 using System.Net.Http.Headers;
 using manage_auth.src.models;
 using manage_auth.src.models.requests;
-using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1;
 
 namespace manage_auth.src.clients
 {
@@ -38,6 +36,13 @@ namespace manage_auth.src.clients
             {
                 throw new Exception(response.ReasonPhrase);
             }
+        }
+        
+        public async Task<User> GetUser(string email, string bearerToken)
+        {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken.ToString());
+            var response = await _client.GetFromJsonAsync<User>($"/api/Users/email/{email}");
+            return response;
         }
     }
 }

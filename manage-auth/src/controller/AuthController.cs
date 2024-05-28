@@ -39,7 +39,8 @@ namespace manage_auth.src.controller
             {
                 try
                 {
-                    return Ok();
+                    var bearerToken = await GetBearerToken();
+                    return Ok(bearerToken);
                 }
                 catch (Exception ex)
                 {
@@ -74,7 +75,7 @@ namespace manage_auth.src.controller
         }
 
         [HttpPost("user/authenticate")]
-        [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AuthenticationResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> AuthenticateUser(AuthenticateUserRequest authenticateUserRequest)
         {
             if (_validator.ValidateAuthenticateUser(authenticateUserRequest))
@@ -82,10 +83,12 @@ namespace manage_auth.src.controller
                 try
                 {
                     var authResponse = await _cognitoClient.AuthenticateUserAsync(authenticateUserRequest);
-                    var response = new AuthResponse()
+                    var authenticatedUser = await _usersClient.GetUser(authenticateUserRequest.Email, authResponse.AuthenticationResult.AccessToken);
+                    var response = new AuthenticationResponse()
                     {
                         AuthenticationResult = authResponse.AuthenticationResult,
-                        Status = authResponse.HttpStatusCode
+                        Status = authResponse.HttpStatusCode,
+                        User = authenticatedUser
                     };
                     return Ok(response);
                 }
@@ -152,52 +155,30 @@ namespace manage_auth.src.controller
         {
             var clientId = _configuration["AWS:Cognito:ClientId"];
             var clientSecret = _configuration["AWS:Cognito:ClientSecret"];
-            var cognitoDomain = _configuration["AWS:Cognito:Domain"];
-            // var tokenEndpoint = _configuration["AWS:Cognito:TokenEndpoint"];
-            var region = _configuration["AWS:Cognito:Region"];
-            var userPoolId = _configuration["AWS:Cognito:UserPoolId"];
-
-            var tokenEndpoint = $"https://projectb-userpool-dev.auth.us-east-1.amazoncognito.com/oauth2/token";
-            var scope = "openid";
+            var tokenEndpoint = _configuration["AWS:Cognito:TokenEndpoint"];
 
             var client = new HttpClient();
-            
-            // Prepare the request data
-            var requestData = new
-            {
-                grant_type = "client_credentials",
-                client_id = clientId,
-                client_secret = clientSecret
-            };
 
-            var content = new FormUrlEncodedContent(new[]
-            {
+            var content = new FormUrlEncodedContent(
+            [
                 new KeyValuePair<string, string>("grant_type", "client_credentials"),
                 new KeyValuePair<string, string>("client_id", clientId),
                 new KeyValuePair<string, string>("client_secret", clientSecret)
-            });
+            ]);
 
-            // Set the Content-Type header
             content.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
-
-            // var content = new StringContent(JsonConvert.SerializeObject(requestData), Encoding.UTF8, "application/json");
             
-            // Send the request
             var response = await client.PostAsync(tokenEndpoint, content);
             
-            // Handle the response
             if (response.IsSuccessStatusCode)
             {
                 var responseBody = await response.Content.ReadAsStringAsync();
                 var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseBody);
-                Console.WriteLine("Bearer Token: " + tokenResponse.access_token);
                 return tokenResponse;
             }
             else
             {
-                var err = response.ReasonPhrase;
-                Console.WriteLine("Error: " + err);
-                throw new Exception(err);
+                throw new Exception(response.ReasonPhrase);
             }
         }
         
