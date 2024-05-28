@@ -28,8 +28,6 @@ namespace manage_auth.src.clients
 
             if (response.IsSuccessStatusCode)
             {
-                // var responseData = await response.Content.ReadAsStringAsync();
-                // return responseData;
                 return response;
             }
             else 
