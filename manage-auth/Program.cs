@@ -28,6 +28,7 @@ builder.Services.AddSingleton<IRequestValidator, RequestValidator>();
 builder.Services.AddSingleton<IAuthRepository, AuthRepository>();
 builder.Services.AddSingleton<IAuthDataservice, AuthDataservice>();
 builder.Services.AddSingleton<ICognitoClient, CognitoClient>();
+builder.Services.AddSingleton<IUsersClient, UsersClient>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -45,6 +46,18 @@ builder.Services.AddSwaggerGen(options =>
                     },
         });
     });
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            // Allow all origins, methods, and headers
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
 
 
 var userPoolId = configuration["AWS:Cognito:UserPoolId"];
@@ -79,6 +92,8 @@ if (app.Environment.IsDevelopment())
     });
     // app.UseDeveloperExceptionPage();
 }
+
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 

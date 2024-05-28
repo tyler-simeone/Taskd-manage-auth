@@ -1,8 +1,8 @@
 namespace manage_auth.src.models.requests
 {
-    public class CreateUser
+    public class CreateUserRequest
     {
-        public CreateUser()
+        public CreateUserRequest()
         {
 
         }
@@ -14,9 +14,5 @@ namespace manage_auth.src.models.requests
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
-
-        public string PhoneNumber { get; set; }
-
-        public string Address { get; set; }
     }
 }
