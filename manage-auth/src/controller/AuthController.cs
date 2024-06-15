@@ -125,6 +125,28 @@ namespace manage_auth.src.controller
                 return BadRequest("CreateUserRequest is required.");
             }
         }
+
+        [HttpPost("user/resendconfirmationcode")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ResendConfirmationCode(string email)
+        {
+            if (_validator.ValidateResendConfirmationCode(email))
+            {
+                try
+                {
+                    var resendConfirmationCodeResponse = await _cognitoClient.ResendConfirmationCodeAsync(email);
+                    return Ok(resendConfirmationCodeResponse);
+                }
+                catch (Exception ex)
+                {
+                    return InternalError(ex.Message);
+                }
+            }
+            else
+            {
+                return BadRequest("ConfirmUserRequest is required.");
+            }
+        }
         
         [HttpPost("user/confirm")]
         [ProducesResponseType(StatusCodes.Status200OK)]

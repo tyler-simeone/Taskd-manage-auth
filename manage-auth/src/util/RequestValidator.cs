@@ -12,6 +12,8 @@ namespace manage_auth.src.util
 
         bool ValidateCreateUser(CreateUserRequest createUserRequest);
         
+        bool ValidateResendConfirmationCode(string email);
+
         bool ValidateConfirmUser(ConfirmUserRequest confirmUserRequest);
 
         bool ValidateAuthenticateUser(AuthenticateUserRequest authenticateUserRequest);
@@ -45,6 +47,11 @@ namespace manage_auth.src.util
             return true;
         }
         
+        public bool ValidateResendConfirmationCode(string email)
+        {
+            return true;
+        }
+
         public bool ValidateConfirmUser(ConfirmUserRequest confirmUserRequest)
         {
             return true;
