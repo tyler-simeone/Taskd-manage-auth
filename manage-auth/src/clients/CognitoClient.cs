@@ -74,6 +74,27 @@ namespace manage_auth.src.clients
             await _cognitoClient.SignUpAsync(signUpRequest);
         }
         
+        public async Task<ResendConfirmationCodeResponse> ResendConfirmationCodeAsync(string email)
+        {
+            var request = new ResendConfirmationCodeRequest
+            {
+                ClientId = _clientId,
+                Username = email,
+                SecretHash = GetSecretHash(email, _clientId, _clientSecret)
+            };
+
+            try
+            {
+                var response = await _cognitoClient.ResendConfirmationCodeAsync(request).ConfigureAwait(false);
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error resending confirmation code: {e.Message}");
+                throw e;
+            }
+        }
+
         public async Task<ConfirmSignUpResponse> ConfirmUserAsync(ConfirmUserRequest confirmUserRequest)
         {
             var confirmRequest = new ConfirmSignUpRequest

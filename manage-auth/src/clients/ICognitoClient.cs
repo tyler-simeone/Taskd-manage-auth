@@ -9,6 +9,8 @@ namespace manage_auth.src.clients
 
         public Task<InitiateAuthResponse> AuthenticateUserAsync(AuthenticateUserRequest authUserRequest);
 
+        public Task<ResendConfirmationCodeResponse> ResendConfirmationCodeAsync(string email);
+
         public Task<ConfirmSignUpResponse> ConfirmUserAsync(ConfirmUserRequest confirmUserRequest);
     }
 }
