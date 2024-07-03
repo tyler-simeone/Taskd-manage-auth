@@ -125,17 +125,39 @@ namespace manage_auth.src.controller
                 return BadRequest("CreateUserRequest is required.");
             }
         }
-
-        [HttpPost("user/resendconfirmationcode")]
+        
+        [HttpPost("user/confirm")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> ResendConfirmationCode(string email)
+        public async Task<IActionResult> ConfirmUser(ConfirmUserRequest confirmUserRequest)
         {
-            if (_validator.ValidateResendConfirmationCode(email))
+            if (_validator.ValidateConfirmUser(confirmUserRequest))
             {
                 try
                 {
-                    var resendConfirmationCodeResponse = await _cognitoClient.ResendConfirmationCodeAsync(email);
-                    return Ok(resendConfirmationCodeResponse);
+                    var confirmSignUpResponse = await _cognitoClient.ConfirmUserAsync(confirmUserRequest);
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    return InternalError(ex.Message);
+                }
+            }
+            else
+            {
+                return BadRequest("ConfirmUserRequest is required.");
+            }
+        }
+
+        [HttpPost("user/initiateresetpassword")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> InititeResetPassword(string email)
+        {
+            if (_validator.ValidateResetPassword(email))
+            {
+                try
+                {
+                    var resetPasswordResponse = await _cognitoClient.ResetPasswordAsync(email);
+                    return Ok(resetPasswordResponse);
                 }
                 catch (Exception ex)
                 {
@@ -148,16 +170,38 @@ namespace manage_auth.src.controller
             }
         }
         
-        [HttpPost("user/confirm")]
+        [HttpPost("user/resetpassword")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> ConfirmUser(ConfirmUserRequest confirmUserRequest)
+        public async Task<IActionResult> ResetPassword(ResetPasswordRequest resetPasswordRequest)
         {
-            if (_validator.ValidateConfirmUser(confirmUserRequest))
+            if (_validator.ValidateConfirmResetPassword(resetPasswordRequest))
             {
                 try
                 {
-                    var confirmSignUpResponse = await _cognitoClient.ConfirmUserAsync(confirmUserRequest);
-                    return Ok();
+                    var resetPasswordResponse = await _cognitoClient.ConfirmResetPasswordAsync(resetPasswordRequest);
+                    return Ok(resetPasswordResponse);
+                }
+                catch (Exception ex)
+                {
+                    return InternalError(ex.Message);
+                }
+            }
+            else
+            {
+                return BadRequest("ConfirmUserRequest is required.");
+            }
+        }
+
+        [HttpPost("user/resendconfirmationcode")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ResendConfirmationCode(string email)
+        {
+            if (_validator.ValidateResendConfirmationCode(email))
+            {
+                try
+                {
+                    var resendConfirmationCodeResponse = await _cognitoClient.ResendConfirmationCodeAsync(email);
+                    return Ok(resendConfirmationCodeResponse);
                 }
                 catch (Exception ex)
                 {

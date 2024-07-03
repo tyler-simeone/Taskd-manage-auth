@@ -73,27 +73,6 @@ namespace manage_auth.src.clients
 
             await _cognitoClient.SignUpAsync(signUpRequest);
         }
-        
-        public async Task<ResendConfirmationCodeResponse> ResendConfirmationCodeAsync(string email)
-        {
-            var request = new ResendConfirmationCodeRequest
-            {
-                ClientId = _clientId,
-                Username = email,
-                SecretHash = GetSecretHash(email, _clientId, _clientSecret)
-            };
-
-            try
-            {
-                var response = await _cognitoClient.ResendConfirmationCodeAsync(request).ConfigureAwait(false);
-                return response;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Error resending confirmation code: {e.Message}");
-                throw e;
-            }
-        }
 
         public async Task<ConfirmSignUpResponse> ConfirmUserAsync(ConfirmUserRequest confirmUserRequest)
         {
@@ -113,6 +92,72 @@ namespace manage_auth.src.clients
             catch (Exception e)
             {
                 Console.WriteLine($"Error authenticating user: {e.Message}");
+                throw e;
+            }
+        }
+        
+        public async Task<ForgotPasswordResponse> ResetPasswordAsync(string email)
+        {
+            var request = new ForgotPasswordRequest
+            {
+                ClientId = _clientId,
+                Username = email,
+                SecretHash = GetSecretHash(email, _clientId, _clientSecret)
+            };
+
+            try
+            {
+                var forgotPasswordResponse = await _cognitoClient.ForgotPasswordAsync(request).ConfigureAwait(false);
+                return forgotPasswordResponse;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error authenticating user: {e.Message}");
+                throw e;
+            }
+        }
+        
+        public async Task<ConfirmForgotPasswordResponse> ConfirmResetPasswordAsync(ResetPasswordRequest resetPasswordRequest)
+        {
+            var email = resetPasswordRequest.Email;
+            var request = new ConfirmForgotPasswordRequest
+            {
+                ClientId = _clientId,
+                Username = email,
+                ConfirmationCode = resetPasswordRequest.ConfirmationCode,
+                Password = resetPasswordRequest.NewPassword,
+                SecretHash = GetSecretHash(email, _clientId, _clientSecret)
+            };
+
+            try
+            {
+                var confirmForgotPasswordResponse = await _cognitoClient.ConfirmForgotPasswordAsync(request).ConfigureAwait(false);
+                return confirmForgotPasswordResponse;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error authenticating user: {e.Message}");
+                throw e;
+            }
+        }
+
+        public async Task<ResendConfirmationCodeResponse> ResendConfirmationCodeAsync(string email)
+        {
+            var request = new ResendConfirmationCodeRequest
+            {
+                ClientId = _clientId,
+                Username = email,
+                SecretHash = GetSecretHash(email, _clientId, _clientSecret)
+            };
+
+            try
+            {
+                var response = await _cognitoClient.ResendConfirmationCodeAsync(request).ConfigureAwait(false);
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error resending confirmation code: {e.Message}");
                 throw e;
             }
         }
