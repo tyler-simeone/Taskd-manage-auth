@@ -5,6 +5,7 @@ using Amazon.Runtime;
 using System.Text;
 using System.Security.Cryptography;
 using manage_auth.src.models.requests;
+using Microsoft.IdentityModel.Tokens;
 
 namespace manage_auth.src.clients
 {
@@ -19,11 +20,25 @@ namespace manage_auth.src.clients
 
         public CognitoClient(IConfiguration configuration)
         {
-            _userPoolId = configuration["AWS:Cognito:UserPoolId"];
-            _clientId = configuration["AWS:Cognito:ClientId"];
-            _clientSecret = configuration["AWS:Cognito:ClientSecret"];
-            _accessKey = configuration["AWS:Cognito:AccessKey"];
-            _secretAccessKey = configuration["AWS:Cognito:SecretAccessKey"];
+            _userPoolId = configuration["UserPoolId"];
+            if (_userPoolId.IsNullOrEmpty())
+                _userPoolId = configuration["AWS:Cognito:UserPoolId"];
+
+            _clientId = configuration["ClientId"];
+            if (_clientId.IsNullOrEmpty())
+                _clientId = configuration["AWS:Cognito:ClientId"];
+
+            _clientSecret = configuration["ClientSecret"];
+            if (_clientSecret.IsNullOrEmpty())
+                _clientSecret = configuration["AWS:Cognito:ClientSecret"];
+
+            _accessKey = configuration["AccessKey"];
+            if (_accessKey.IsNullOrEmpty())
+                _accessKey = configuration["AWS:Cognito:AccessKey"];
+
+            _secretAccessKey = configuration["SecretAccessKey"];
+            if (_secretAccessKey.IsNullOrEmpty())
+                _secretAccessKey = configuration["AWS:Cognito:SecretAccessKey"];
 
             var credentials = new BasicAWSCredentials(_accessKey, _secretAccessKey);
             _cognitoClient = new AmazonCognitoIdentityProviderClient(credentials, RegionEndpoint.USEast1);

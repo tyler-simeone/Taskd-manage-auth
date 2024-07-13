@@ -1,10 +1,10 @@
-using manage_auth.src.dataservice;
-using manage_auth.src.repository;
-using manage_auth.src.util;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using manage_auth.src.clients;
+using manage_auth.src.repository;
+using manage_auth.src.dataservice;
+using manage_auth.src.util;
 
 var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 // Console.WriteLine($"ASPNETCORE_ENVIRONMENT: {environmentName}");
@@ -20,6 +20,8 @@ var configuration = builder.Configuration;
 
 configuration.AddJsonFile("appsettings.json", optional: false);
 configuration.AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true);
+
+configuration.AddEnvironmentVariables();
 
 
 // Add services to the container.
@@ -47,6 +49,12 @@ builder.Services.AddSwaggerGen(options =>
         });
     });
 
+// Configure Kestrel to listen on port 80
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(80); 
+});
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -60,8 +68,13 @@ builder.Services.AddCors(options =>
 });
 
 
-var userPoolId = configuration["AWS:Cognito:UserPoolId"];
-var awsRegion = configuration["AWS:Cognito:Region"];
+var userPoolId = configuration["UserPoolId"];
+if (userPoolId.IsNullOrEmpty())
+    userPoolId = configuration["AWS:Cognito:UserPoolId"];
+
+var awsRegion = configuration["Region"];
+if (awsRegion.IsNullOrEmpty())
+    awsRegion = configuration["AWS:Cognito:Region"];
 
 // Add JWT Bearer Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
