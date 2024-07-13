@@ -6,6 +6,7 @@ using manage_auth.src.models.errors;
 using manage_auth.src.models.requests;
 using manage_auth.src.util;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 
 namespace manage_auth.src.controller
@@ -218,9 +219,17 @@ namespace manage_auth.src.controller
 
         private async Task<TokenResponse> GetBearerToken()
         {
-            var clientId = _configuration["AWS:Cognito:ClientId"];
-            var clientSecret = _configuration["AWS:Cognito:ClientSecret"];
-            var tokenEndpoint = _configuration["AWS:Cognito:TokenEndpoint"];
+            var clientId = _configuration["ClientId"];
+            if (clientId.IsNullOrEmpty())
+                clientId = _configuration["AWS:Cognito:ClientId"];
+
+            var clientSecret = _configuration["ClientSecret"];
+            if (clientSecret.IsNullOrEmpty())
+                clientSecret = _configuration["AWS:Cognito:ClientSecret"];
+
+            var tokenEndpoint = _configuration["TokenEndpoint"];
+            if (tokenEndpoint.IsNullOrEmpty())
+                tokenEndpoint = _configuration["AWS:Cognito:TokenEndpoint"];
 
             var client = new HttpClient();
 
@@ -238,8 +247,7 @@ namespace manage_auth.src.controller
             if (response.IsSuccessStatusCode)
             {
                 var responseBody = await response.Content.ReadAsStringAsync();
-                var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseBody);
-                return tokenResponse;
+                return JsonConvert.DeserializeObject<TokenResponse>(responseBody);
             }
             else
             {
