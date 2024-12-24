@@ -90,6 +90,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = $"https://cognito-idp.{awsRegion}.amazonaws.com/{userPoolId}"
         };
     });
+    
 // Add authorization
 builder.Services.AddAuthorization();
 

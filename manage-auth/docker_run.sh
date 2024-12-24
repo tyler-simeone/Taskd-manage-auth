@@ -5,9 +5,8 @@ source .env
 
 # Run the Docker container with specified environment variables and port mapping
 docker run -d \
-  --name test-auth \
+  --name manage-auth \
   -p 5058:80 \
-  --network my_custom_network \
   -e ManageUsersLocalConnection=$MANAGE_USERS_LOCAL_CONNECTION \
   -e TokenEndpoint=$TOKEN_ENDPOINT \
   -e ClientId=$CLIENT_ID \
