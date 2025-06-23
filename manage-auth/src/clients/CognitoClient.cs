@@ -41,7 +41,7 @@ namespace manage_auth.src.clients
                 _secretAccessKey = configuration["AWS:Cognito:SecretAccessKey"];
 
             var credentials = new BasicAWSCredentials(_accessKey, _secretAccessKey);
-            _cognitoClient = new AmazonCognitoIdentityProviderClient(credentials, RegionEndpoint.USEast1);
+            _cognitoClient = new AmazonCognitoIdentityProviderClient(credentials, RegionEndpoint.USEast2);
         }
 
         public async Task<InitiateAuthResponse> AuthenticateUserAsync(AuthenticateUserRequest authUserRequest)
