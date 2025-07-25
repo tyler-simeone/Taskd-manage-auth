@@ -35,21 +35,14 @@ namespace manage_auth.src.controller
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> GetBearerToken(int userId)
         {
-            if (_validator.ValidateGetBearerToken(userId))
+            try
             {
-                try
-                {
-                    var bearerToken = await GetBearerToken();
-                    return Ok(bearerToken);
-                }
-                catch (Exception ex)
-                {
-                    return InternalError(ex.Message);
-                }
+                var bearerToken = await GetBearerToken();
+                return Ok(bearerToken);
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest("Task ID is required.");
+                return InternalError(ex.Message);
             }
         }
 
@@ -57,20 +50,13 @@ namespace manage_auth.src.controller
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult AuthorizeRequest(AuthorizeRequest authorizeRequestRequest)
         {
-            if (_validator.ValidateAuthorizeRequest(authorizeRequestRequest))
+            try
             {
-                try
-                {
-                    return Ok();
-                }
-                catch (Exception ex)
-                {
-                    return InternalError(ex.Message);
-                }
+                return Ok();
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest("CreateUserRequest is required.");
+                return InternalError(ex.Message);
             }
         }
 
@@ -78,28 +64,21 @@ namespace manage_auth.src.controller
         [ProducesResponseType(typeof(AuthenticationResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> AuthenticateUser(AuthenticateUserRequest authenticateUserRequest)
         {
-            if (_validator.ValidateAuthenticateUser(authenticateUserRequest))
+            try
             {
-                try
+                var authResponse = await _cognitoClient.AuthenticateUserAsync(authenticateUserRequest);
+                var authenticatedUser = await _usersClient.GetUser(authenticateUserRequest.Email, authResponse.AuthenticationResult.AccessToken);
+                var response = new AuthenticationResponse()
                 {
-                    var authResponse = await _cognitoClient.AuthenticateUserAsync(authenticateUserRequest);
-                    var authenticatedUser = await _usersClient.GetUser(authenticateUserRequest.Email, authResponse.AuthenticationResult.AccessToken);
-                    var response = new AuthenticationResponse()
-                    {
-                        AuthenticationResult = authResponse.AuthenticationResult,
-                        Status = authResponse.HttpStatusCode,
-                        User = authenticatedUser
-                    };
-                    return Ok(response);
-                }
-                catch (Exception ex)
-                {
-                    return InternalError(ex.Message);
-                }
+                    AuthenticationResult = authResponse.AuthenticationResult,
+                    Status = authResponse.HttpStatusCode,
+                    User = authenticatedUser
+                };
+                return Ok(response);
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest("AuthenticateUserRequest is required.");
+                return InternalError(ex.Message);
             }
         }
 
@@ -107,23 +86,16 @@ namespace manage_auth.src.controller
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> RegisterUser(CreateUserRequest createUserRequest)
         {
-            if (_validator.ValidateCreateUser(createUserRequest))
+            try
             {
-                try
-                {
-                    await _cognitoClient.SignUpUserAsync(createUserRequest.Email, createUserRequest.Password, createUserRequest.FirstName, createUserRequest.LastName);
-                    var bearerToken = await GetBearerToken();
-                    await _usersClient.CreateUser(createUserRequest, bearerToken.access_token);
-                    return Ok();
-                }
-                catch (Exception ex)
-                {
-                    return InternalError(ex.Message);
-                }
+                await _cognitoClient.SignUpUserAsync(createUserRequest.Email, createUserRequest.Password, createUserRequest.FirstName, createUserRequest.LastName);
+                var bearerToken = await GetBearerToken();
+                await _usersClient.CreateUser(createUserRequest, bearerToken.access_token);
+                return Ok();
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest("CreateUserRequest is required.");
+                return InternalError(ex.Message);
             }
         }
         
@@ -131,21 +103,14 @@ namespace manage_auth.src.controller
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ConfirmUser(ConfirmUserRequest confirmUserRequest)
         {
-            if (_validator.ValidateConfirmUser(confirmUserRequest))
+            try
             {
-                try
-                {
-                    var confirmSignUpResponse = await _cognitoClient.ConfirmUserAsync(confirmUserRequest);
-                    return Ok();
-                }
-                catch (Exception ex)
-                {
-                    return InternalError(ex.Message);
-                }
+                var confirmSignUpResponse = await _cognitoClient.ConfirmUserAsync(confirmUserRequest);
+                return Ok();
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest("ConfirmUserRequest is required.");
+                return InternalError(ex.Message);
             }
         }
 
@@ -153,21 +118,14 @@ namespace manage_auth.src.controller
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> InititeResetPassword(string email)
         {
-            if (_validator.ValidateResetPassword(email))
+            try
             {
-                try
-                {
-                    var resetPasswordResponse = await _cognitoClient.ResetPasswordAsync(email);
-                    return Ok(resetPasswordResponse);
-                }
-                catch (Exception ex)
-                {
-                    return InternalError(ex.Message);
-                }
+                var resetPasswordResponse = await _cognitoClient.ResetPasswordAsync(email);
+                return Ok(resetPasswordResponse);
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest("ConfirmUserRequest is required.");
+                return InternalError(ex.Message);
             }
         }
         
@@ -175,21 +133,14 @@ namespace manage_auth.src.controller
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ResetPassword(ResetPasswordRequest resetPasswordRequest)
         {
-            if (_validator.ValidateConfirmResetPassword(resetPasswordRequest))
+            try
             {
-                try
-                {
-                    var resetPasswordResponse = await _cognitoClient.ConfirmResetPasswordAsync(resetPasswordRequest);
-                    return Ok(resetPasswordResponse);
-                }
-                catch (Exception ex)
-                {
-                    return InternalError(ex.Message);
-                }
+                var resetPasswordResponse = await _cognitoClient.ConfirmResetPasswordAsync(resetPasswordRequest);
+                return Ok(resetPasswordResponse);
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest("ConfirmUserRequest is required.");
+                return InternalError(ex.Message);
             }
         }
 
@@ -197,21 +148,14 @@ namespace manage_auth.src.controller
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ResendConfirmationCode(string email)
         {
-            if (_validator.ValidateResendConfirmationCode(email))
+            try
             {
-                try
-                {
-                    var resendConfirmationCodeResponse = await _cognitoClient.ResendConfirmationCodeAsync(email);
-                    return Ok(resendConfirmationCodeResponse);
-                }
-                catch (Exception ex)
-                {
-                    return InternalError(ex.Message);
-                }
+                var resendConfirmationCodeResponse = await _cognitoClient.ResendConfirmationCodeAsync(email);
+                return Ok(resendConfirmationCodeResponse);
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest("ConfirmUserRequest is required.");
+                return InternalError(ex.Message);
             }
         }
 
